@@ -1,0 +1,38 @@
+version: '3'
+
+services:
+  web:
+    restart: unless-stopped
+    build: .
+    depends_on:
+      - db
+    volumes:
+      - web-static:/app/static
+    networks: 
+      - custom_net
+  nginx:
+    restart: unless-stopped
+    build: ./nginx
+    ports:
+      - "8000:8000"
+    volumes:
+      - web-static:/src/static
+    networks: 
+      - custom_net
+        
+  db:
+    restart: unless-stopped
+    image: postgres:latest
+    environment:
+            - POSTGRES_HOST_AUTH_METHOD=trust
+    volumes:
+      - pgdata:/var/lib/postgresql/data/
+    networks: 
+      - custom_net
+volumes:
+  pgdata:
+  web-static:
+
+networks:
+  custom_net:
+    driver: bridge
